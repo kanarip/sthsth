@@ -1,5 +1,17 @@
 <?php
+/**
+    A custom ID generator for Doctrine, that returns a lower-case UUID string.
 
+    PHP Version 7.1+
+
+    @category  PHP
+    @package   App_Utils
+    @author    Jeroen van Meeuwen (Kolab Systems) <vanmeeuwen@kolabsys.com>
+    @author    Christian Mollekopf (Kolab Systems) <mollekopf@kolabsys.com>
+    @copyright 2019 Kolab Systems AG <contact@kolabsystems.com>
+    @license   GPLv3 (https://www.gnu.org/licenses/gpl.txt)
+    @link      https://pxts.ch
+ */
 namespace App\Utils;
 
 use Doctrine\ORM\Id\AbstractIdGenerator;
@@ -17,9 +29,7 @@ class UuidStrGenerator extends AbstractIdGenerator
         do {
             // You can use uniqid(), http://php.net/manual/en/function.uniqid.php
             $uuid = strtolower(Uuid::uuid4());
-
         } while ($em->find($entityName, $uuid));
-
 
         return $uuid;
     }

@@ -10,7 +10,7 @@ use App\Entity\Wallet;
 
 class AccountFixtures extends Fixture
 {
-    private $accounts = [
+    private $_accounts = [
         "John Doe",
         "Jane Doe",
         "Joe Sixpack",
@@ -20,7 +20,7 @@ class AccountFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
-        foreach ($this->accounts as $name) {
+        foreach ($this->_accounts as $name) {
             $account = new Account();
             $account->setDisplayName($name);
             $wallet = new Wallet();

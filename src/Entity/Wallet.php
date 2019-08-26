@@ -1,122 +1,248 @@
 <?php
+/**
+    A wallet contains the credit for Accounts to consume SKU as entitlements.
 
+    PHP Version 7.1+
+
+    @category  PHP
+    @package   App_Entity
+    @author    Jeroen van Meeuwen (Kolab Systems) <vanmeeuwen@kolabsys.com>
+    @author    Christian Mollekopf (Kolab Systems) <mollekopf@kolabsys.com>
+    @copyright 2019 Kolab Systems AG <contact@kolabsystems.com>
+    @license   GPLv3 (https://www.gnu.org/licenses/gpl.txt)
+    @link      https://pxts.ch
+ */
 namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\WalletRepository")
+    ORM definition of a Wallet.
+
+    @category  PHP
+    @package   App_Entity
+    @author    Jeroen van Meeuwen (Kolab Systems) <vanmeeuwen@kolabsys.com>
+    @author    Christian Mollekopf (Kolab Systems) <mollekopf@kolabsys.com>
+    @copyright 2019 Kolab Systems AG <contact@kolabsystems.com>
+    @license   GPLv3 (https://www.gnu.org/licenses/gpl.txt)
+    @link      https://pxts.ch
+
+    @ORM\Entity(repositoryClass="App\Repository\WalletRepository")
  */
 class Wallet
 {
     /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     * @ORM\Column(type="string", length=32)
-     * @ORM\CustomIdGenerator(class="App\Utils\UuidStrGenerator")
+        A unique ID.
+
+        @var \String(32)
+
+        @ORM\Id()
+        @ORM\GeneratedValue(strategy="CUSTOM")
+        @ORM\Column(
+            type="string",
+            length=32
+        )
+
+        @ORM\CustomIdGenerator(class="App\Utils\UuidStrGenerator")
      */
-    private $UUID;
+    private $_UUID;
 
     /**
         A description for the wallet.
 
+        @var \String(128)
+
         @ORM\Column(type="string", length=128, nullable=true)
      */
-    private $description = "This is a wallet";
+    private $_description = "This is a wallet";
 
     /**
         The current balance for the wallet.
 
+        @var float
+
         @ORM\Column(type="float")
      */
-    private $balance = 0.00;
+    private $_balance = 0.00;
 
     /**
         The amount in the wallet that is refundable.
 
+        @var float
+
         @ORM\Column(type="float")
      */
-    private $refundable = 0.00;
+    private $_refundable = 0.00;
 
     /**
-     * @ORM\Column(type="string", length=3)
+        The currency for the wallet.
+
+        @var \String(3)
+
+        @ORM\Column(type="string", length=3)
      */
-    private $currency = 'CHF';
+    private $_currency = 'CHF';
 
     /**
+        The owner of the wallet. Every wallet has one owner, but an owner may have multiple
+        wallets.
+
         @ORM\ManyToOne(targetEntity="Account", cascade={"persist"})
-        @ORM\JoinColumn(name="account_uuid", referencedColumnName="uuid")
+        @ORM\JoinColumn(
+            name="account_uuid",
+            referencedColumnName="uuid"
+        )
      */
-    private $owner;
+    private $_owner;
 
-    public function debit($total)
+    /**
+        Decrease the amount in this wallet by $debit.
+
+        @param float $debit The amount to decrease the wallet balance with.
+
+        @return self
+     */
+    public function debit(float $debit)
     {
-        $this->balance -= $total;
+        $this->_balance -= $debit;
+
+        return $this;
     }
 
-    public function credit($credit)
+    /**
+        Increase the amount in this wallet by $credit.
+
+        @param float $credit The amount to increase the wallet balance with.
+
+        @return self
+     */
+    public function credit(float $credit)
     {
-        $this->balance += $credit;
+        $this->_balance += $credit;
+
+        return $this;
     }
 
-    public function isRefundable(): ?bool
+    /**
+        Is any of the credit refundable?
+
+        @return bool
+     */
+    public function isRefundable()
     {
         $now = new \DateTime();
         $then = $now->sub(new \DateInterval('P14D'));
 
-        return ($this->owner->getCreated() > $then);
+        return ($this->_owner->getCreated() > $then);
     }
 
-    public function getUUID(): ?int
+    /**
+        The UUID
+
+        @return int
+     */
+    public function getUUID()
     {
-        return $this->UUID;
+        return $this->_UUID;
     }
 
-    public function getBalance(): ?float
+    /**
+        The current balance for the wallet.
+
+        @return float
+     */
+    public function getBalance()
     {
-        return $this->balance;
+        return $this->_balance;
     }
 
-    public function setBalance(float $balance): self
+    /**
+        Set the balance in this wallet.
+
+        @param float $balance The amount of credit to set the balance to.
+
+        @return self
+     */
+    public function setBalance(float $balance)
     {
-        $this->balance = $balance;
+        $this->_balance = $balance;
 
         return $this;
     }
 
-    public function getCurrency(): ?string
+    /**
+        Retrieve the currency for this wallet.
+
+        Accounts may hold multiple wallets with different currencies.
+
+        @return string The notation used in Open Exchange Rates
+     */
+    public function getCurrency()
     {
-        return $this->currency;
+        return $this->_currency;
     }
 
-    public function setCurrency(string $currency): self
+    /**
+        Set the currency for this wallet.
+
+        Probably should not be used on wallets with a balance.
+
+        @param string $currency The new currency for this wallet.
+
+        @return self
+     */
+    public function setCurrency(string $currency)
     {
-        $this->currency = $currency;
+        $this->_currency = $currency;
 
         return $this;
     }
 
-    public function getDescription(): ?string
+    /**
+        Retrieve the description for this wallet.
+
+        @return string
+     */
+    public function getDescription()
     {
-        return $this->description;
+        return $this->_description;
     }
 
-    public function setDescription(?string $description): self
+    /**
+        Set the description for the wallet.
+
+        @param string|null $description The description
+
+        @return self
+     */
+    public function setDescription(string $description = null)
     {
-        $this->description = $description;
+        $this->_description = $description;
 
         return $this;
     }
 
-    public function getOwner(): ?Account
+    /**
+        Get the owner of this wallet.
+
+        @return Account
+     */
+    public function getOwner()
     {
-        return $this->owner;
+        return $this->_owner;
     }
 
-    public function setOwner(?Account $owner): self
+    /**
+        Set the owner of this wallet.
+
+        @param Account $owner The new owner.
+
+        @return self
+     */
+    public function setOwner(Account $owner)
     {
-        $this->owner = $owner;
+        $this->_owner = $owner;
 
         return $this;
     }

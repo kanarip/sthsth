@@ -1,96 +1,127 @@
 <?php
+/**
+    An entitlement is an SKU taken out by an account and billed to a wallet.
 
+    PHP Version 7.1+
+
+    @category  PHP
+    @package   App_Entity
+    @author    Jeroen van Meeuwen (Kolab Systems) <vanmeeuwen@kolabsys.com>
+    @author    Christian Mollekopf (Kolab Systems) <mollekopf@kolabsys.com>
+    @copyright 2019 Kolab Systems AG <contact@kolabsystems.com>
+    @license   GPLv3 (https://www.gnu.org/licenses/gpl.txt)
+    @link      https://pxts.ch
+ */
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\EntitlementRepository")
+    ORM definition of an Entitlement.
+
+    PHP Version 7.1+
+
+    @category  PHP
+    @package   App_DataFixtures_EntlementFixtures
+    @author    Jeroen van Meeuwen (Kolab Systems) <vanmeeuwen@kolabsys.com>
+    @author    Christian Mollekopf (Kolab Systems) <mollekopf@kolabsys.com>
+    @copyright 2019 Kolab Systems AG <contact@kolabsystems.com>
+    @license   GPLv3 (https://www.gnu.org/licenses/gpl.txt)
+    @link      https://pxts.ch
+
+    @ORM\Entity(repositoryClass="App\Repository\EntitlementRepository")
  */
 class Entitlement
 {
     /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
+        A unique ID.
+
+        @ORM\Id()
+        @ORM\GeneratedValue(strategy="CUSTOM")
+        @ORM\Column(
+            type="string",
+            length=32,
+            name="uuid"
+        )
+
+        @ORM\CustomIdGenerator(class="App\Utils\UuidStrGenerator")
      */
-    private $id;
+    private $_UUID;
 
     /**
-     * @ORM\Column(type="string", length=32)
+        A short title for this entitlement.
+
+        @ORM\Column(type="string", length=255)
      */
-    private $uuid;
+    private $_title;
 
     /**
-     * @ORM\Column(type="string", length=255)
+        A longer description for this entitlement.
+
+        @ORM\Column(type="string", length=255)
      */
-    private $title;
+    private $_description;
 
     /**
-     * @ORM\Column(type="string", length=255)
+        The cost for this entitlement after discounts.
+
+        @ORM\Column(type="float")
      */
-    private $description;
+    private $_cost = 0.00;
 
     /**
-     * @ORM\Column(type="float")
+        The wallet to which this entitlement is billed.
+
+        @ORM\ManyToOne(targetEntity="Wallet")
+        @ORM\JoinColumn(
+            name="wallet_uuid",
+            referencedColumnName="uuid"
+        )
      */
-    private $cost = 0.00;
+    private $_wallet;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Wallet")
-     * @ORM\JoinColumn(name="wallet_uuid", referencedColumnName="uuid")
-     */
-    private $wallet;
+        Get this entitlements UUID.
 
-    public function getId(): ?int
+        @return string
+     */
+    public function getUUID()
     {
-        return $this->id;
+        return $this->_UUID;
     }
 
-    public function getUuid(): ?string
+    public function getTitle()
     {
-        return $this->uuid;
+        return $this->_title;
     }
 
-    public function setUuid(string $uuid): self
+    public function setTitle(string $title)
     {
-        $this->uuid = strtolower($uuid);
+        $this->_title = $title;
 
         return $this;
     }
 
-    public function getTitle(): ?string
+    public function getDescription()
     {
-        return $this->title;
+        return $this->_description;
     }
 
-    public function setTitle(string $title): self
+    public function setDescription(string $description)
     {
-        $this->title = $title;
+        $this->_description = $description;
 
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getCost()
     {
-        return $this->description;
+        return $this->_cost;
     }
 
-    public function setDescription(string $description): self
+    public function setCost(float $cost)
     {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    public function getCost(): ?float
-    {
-        return $this->cost;
-    }
-
-    public function setCost(float $cost): self
-    {
-        $this->cost = $cost;
+        $this->_cost = $cost;
 
         return $this;
     }

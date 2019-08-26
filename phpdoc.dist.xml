@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Copyright 2019 Kolab Systems AG. All rights reserved. -->
+<phpdoc>
+    <title>Documentation of The Donald</title>
+    <parser>
+        <target>docs</target>
+    </parser>
+    <transformer>
+        <target>docs</target>
+    </transformer>
+    <files>
+        <directory>src/</directory>
+        <directory>vendor/doctrine/orm/lib/</directory>
+        <file>vendor/symfony/http-kernel/Kernel.php</file>
+    </files>
+</phpdoc>

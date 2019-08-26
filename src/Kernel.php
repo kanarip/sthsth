@@ -1,5 +1,16 @@
 <?php
+/**
+    Kernel of the application.
 
+    PHP Version 7.1
+
+    @category  PHP
+    @package   App_Entity_Account
+    @author    Jeroen van Meeuwen (Kolab Systems) <vanmeeuwen@kolabsys.com>
+    @copyright 2019 Kolab Systems AG <contact@kolabsystems.com>
+    @license   GPLv3 (https://www.gnu.org/licenses/gpl.txt)
+    @link      https://kolabnow.com
+ */
 namespace App;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
@@ -9,14 +20,23 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\RouteCollectionBuilder;
 
+/**
+    {@inheritDoc}
+ */
 class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
 
-    private const CONFIG_EXTS = '.{php,xml,yaml,yml}';
+    const CONFIG_EXTS = '.{php,xml,yaml,yml}';
 
-    public function registerBundles(): iterable
+    /**
+        {@inheritDoc}
+
+        @return \Iterable
+     */
+    public function registerBundles()
     {
+        // phpcs:ignore
         $contents = require $this->getProjectDir().'/config/bundles.php';
         foreach ($contents as $class => $envs) {
             if ($envs[$this->environment] ?? $envs['all'] ?? false) {
@@ -25,12 +45,25 @@ class Kernel extends BaseKernel
         }
     }
 
-    public function getProjectDir(): string
+    /**
+        {@inheritDoc}
+
+        @return string
+     */
+    public function getProjectDir()
     {
         return \dirname(__DIR__);
     }
 
-    protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader): void
+    /**
+        {@inheritDoc}
+
+        @param ContainerBuilder $container A container (builder)?
+        @param LoaderInterface  $loader    A loader (interface)?
+
+        @return void
+     */
+    protected function configureContainer(ContainerBuilder $container, LoaderInterface $loader)
     {
         $container->addResource(new FileResource($this->getProjectDir().'/config/bundles.php'));
         $container->setParameter('container.dumper.inline_class_loader', true);
@@ -42,11 +75,23 @@ class Kernel extends BaseKernel
         $loader->load($confDir.'/{services}_'.$this->environment.self::CONFIG_EXTS, 'glob');
     }
 
-    protected function configureRoutes(RouteCollectionBuilder $routes): void
+    /**
+        Configure routes.
+
+        @param RouteCollectionBuilder $routes A routes collection (builder)?
+
+        @return void
+     */
+    protected function configureRoutes(RouteCollectionBuilder $routes)
     {
         $confDir = $this->getProjectDir().'/config';
 
-        $routes->import($confDir.'/{routes}/'.$this->environment.'/**/*'.self::CONFIG_EXTS, '/', 'glob');
+        $routes->import(
+            $confDir.'/{routes}/'.$this->environment.'/**/*'.self::CONFIG_EXTS,
+            '/',
+            'glob'
+        );
+
         $routes->import($confDir.'/{routes}/*'.self::CONFIG_EXTS, '/', 'glob');
         $routes->import($confDir.'/{routes}'.self::CONFIG_EXTS, '/', 'glob');
     }
